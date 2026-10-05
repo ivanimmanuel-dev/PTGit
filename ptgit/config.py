@@ -1,4 +1,4 @@
-"""Conservative IOS normalization: keep command and ACL order within contexts."""
+"""Normalize interface names and IP masks while preserving IOS command order."""
 
 from dataclasses import dataclass, asdict
 from collections import Counter

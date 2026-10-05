@@ -97,21 +97,20 @@ def lint(snapshot: Snapshot) -> list[Finding]:
         left = access_vlans.get((link.a.device, link.a.port))
         right = access_vlans.get((link.b.device, link.b.port))
         if left and right and left != right:
-            # Different access VLANs may be intentional; do not call this an error.
             findings.append(Finding("warning", "ACCESS_VLAN_MISMATCH", location,
-                                    f"Access VLANs differ ({left} vs {right}); confirm this is intentional."))
+                                    f"Access VLANs differ ({left} vs {right})."))
     for end, links in usage.items():
         if len(links) > 1 and end.port != "?":
             findings.append(Finding("warning", "PORT_REUSED", f"{end.device}:{end.port}",
-                                    "The same port participates in multiple cables."))
+                                    "Multiple cables use this port."))
     for address, locations in addresses.items():
         if len(locations) > 1:
             findings.append(Finding("warning", "DUPLICATE_IP", ", ".join(sorted(locations)),
-                                    f"{address} is assigned more than once; separate VRFs/networks may make this intentional."))
+                                    f"{address} is assigned to multiple interfaces."))
     if len(snapshot.devices) > 1:
         for name in names - connected:
             findings.append(Finding("info", "NO_CABLE", name,
-                                    "No modeled cable; wireless or deliberately isolated devices may be valid."))
+                                    "No cable connections found."))
     return sorted(set(findings))
 
 

@@ -1,4 +1,4 @@
-"""Shared semantic budgets, checked before rendering or JSON expansion."""
+"""Limit fields and expanded snapshots before rendering."""
 from dataclasses import fields, is_dataclass
 
 from .errors import PTGitError
@@ -21,7 +21,7 @@ def check_model_budget(model):
         used += 64
         if isinstance(item, str):
             if len(item) > MAX_FIELD_CHARS:
-                raise PTGitError("Modeled field exceeds the 65,536-character semantic limit.")
+                raise PTGitError("Field exceeds the 65,536-character limit.")
             used += len(item.encode("utf-8"))
         elif is_dataclass(item):
             pending.extend(getattr(item, f.name) for f in fields(item))
@@ -31,4 +31,4 @@ def check_model_budget(model):
         elif isinstance(item, (list, tuple)):
             pending.extend(item)
         if used > MAX_MODEL_BYTES:
-            raise PTGitError("Expanded semantic model exceeds the 8 MiB budget (including object overhead).")
+            raise PTGitError("Snapshot exceeds the 8 MiB processing limit.")

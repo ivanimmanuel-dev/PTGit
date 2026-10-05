@@ -36,8 +36,7 @@ def load_xml(path: str | Path) -> ET.Element:
                 data = try_legacy_decompile(data)
             except ValueError:
                 raise PTGitError(f"Cannot decode Packet Tracer lab: {exc}. "
-                                 "The legacy container did not match either. "
-                                 "Try saving a copy as .pkt in Packet Tracer.") from exc
+                                 "Save a .pkt copy in Packet Tracer and retry.") from exc
     if len(data) > MAX_XML:
         raise PTGitError("Decoded XML exceeds the 64 MiB limit.")
     try:

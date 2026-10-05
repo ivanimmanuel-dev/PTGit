@@ -14,11 +14,12 @@ from ptgit.render import diff, show, change_groups
 from ptgit.lint import lint
 
 ROOT = Path(__file__).resolve().parents[1]
+FIXTURES = ROOT / "tests" / "fixtures"
 
 
-class ReleaseRegressionTests(unittest.TestCase):
+class RegressionTests(unittest.TestCase):
     def snapshot(self):
-        return parse_snapshot(ET.parse(ROOT / "examples/new.xml").getroot())
+        return parse_snapshot(ET.parse(FIXTURES / "new.xml").getroot())
 
     def test_repeated_interface_contexts_keep_their_order(self):
         a = parse_config(["interface Gi0/1", " shutdown", "!", "interface Gi0/1", " no shutdown"])
@@ -54,7 +55,7 @@ class ReleaseRegressionTests(unittest.TestCase):
         self.assertTrue(diff(a, b))
 
     def test_large_numeric_ids_fail_cleanly(self):
-        root = ET.parse(ROOT / "examples/new.xml").getroot()
+        root = ET.parse(FIXTURES / "new.xml").getroot()
         for engine in root.findall("NETWORK/DEVICES/DEVICE/ENGINE"):
             engine.remove(engine.find("SAVE_REF_ID"))
         root.find("NETWORK/LINKS/LINK/CABLE/FROM").text = "1" * 5000
@@ -70,7 +71,7 @@ class ReleaseRegressionTests(unittest.TestCase):
 
     def test_deterministic_small_malformed_corpus_is_contained(self):
         rng = random.Random(10)
-        original = (ROOT / "examples/new.pkt").read_bytes()
+        original = (FIXTURES / "new.pkt").read_bytes()
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "input.pkt"
             for _ in range(24):
@@ -90,7 +91,7 @@ class ReleaseRegressionTests(unittest.TestCase):
                 with self.assertRaises(PTGitError):
                     self.snapshot()
         with patch("ptgit.limits.MAX_MODEL_BYTES", 128):
-            with self.assertRaisesRegex(PTGitError, "Expanded semantic"):
+            with self.assertRaisesRegex(PTGitError, "8 MiB"):
                 self.snapshot()
 
     def test_budgeted_diff_preserves_changes_and_order(self):
@@ -102,7 +103,7 @@ class ReleaseRegressionTests(unittest.TestCase):
         self.assertEqual(changed, [("replace", ["old"], ["new", "extra"])])
 
     def test_shared_memory_reference_is_ambiguous(self):
-        root = ET.parse(ROOT / "examples/new.xml").getroot()
+        root = ET.parse(FIXTURES / "new.xml").getroot()
         for engine in root.findall("NETWORK/DEVICES/DEVICE/ENGINE"):
             ET.SubElement(engine, "MEM_ADDR").text = "shared"
         cable = root.find("NETWORK/LINKS/LINK/CABLE")
@@ -112,7 +113,7 @@ class ReleaseRegressionTests(unittest.TestCase):
         self.assertTrue(any("<unresolved:" in end.device for link in snapshot.links for end in (link.a, link.b)))
 
     def test_unmodeled_asset_does_not_consume_scalar_budget(self):
-        root = ET.parse(ROOT / "examples/new.xml").getroot()
+        root = ET.parse(FIXTURES / "new.xml").getroot()
         ET.SubElement(root, "UNMODELED_IMAGE_ASSET").text = "image-data" * 10
         with patch("ptgit.model.MAX_FIELD_CHARS", 80):
             self.assertEqual(parse_snapshot(root).semantic_dict(), self.snapshot().semantic_dict())

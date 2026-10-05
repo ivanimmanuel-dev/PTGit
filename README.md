@@ -1,27 +1,26 @@
-# PT Git
+# PTGit
 
-**Meaningful version control for Cisco Packet Tracer labs.**
+Readable Git diffs for Cisco Packet Tracer `.pkt` files. Compare device
+configuration, IP addresses, VLANs, and cables from the command line or in a
+GitHub pull request.
 
 [![Tests](https://github.com/ivanimmanuel-dev/PTGit/actions/workflows/tests.yml/badge.svg)](https://github.com/ivanimmanuel-dev/PTGit/actions/workflows/tests.yml)
 
-See what changed in your network: device configurations, IP addresses, VLANs,
-interfaces, and cables. PT Git turns `.pkt` files into readable diffs, locally
-and in GitHub pull requests.
-
-**Before**
-
-```text
-Binary files a/lab.pkt and b/lab.pkt differ
-```
-
-**With PT Git**
+[Download v0.1.0](https://github.com/ivanimmanuel-dev/PTGit/releases/tag/v0.1.0) ·
+[GitHub Marketplace](https://github.com/marketplace/actions/pt-git-diff)
 
 ```diff
 R1
+  interface GigabitEthernet0/0
+   ip address 192.168.10.1/24
+   no shutdown
 + interface GigabitEthernet0/1
 +  ip address 10.10.20.1/24
++  no shutdown
 
 SW2
+  interface GigabitEthernet0/1
+   switchport mode access
 -  switchport access vlan 10
 +  switchport access vlan 20
 
@@ -29,52 +28,48 @@ Topology
 + R1:GigabitEthernet0/1 <-> SW2:GigabitEthernet0/1 [eStraightThrough]
 ```
 
-Excerpt from the [example diff](examples/diff.txt).
-[Watch the terminal demo](docs/demo.md) or [read the transcript](docs/demo/demo.txt).
+## Install
 
-## Quick start
-
-Requires **Python 3.10+** and **Git**. Install from GitHub:
+Requires Python 3.10+ and Git. From your lab's Git repository:
 
 ```console
-python -m pip install "git+https://github.com/ivanimmanuel-dev/PTGit.git@main"
-cd networking-labs
+python -m pip install "git+https://github.com/ivanimmanuel-dev/PTGit.git@v0.1.0"
 ptgit init
+git add .gitattributes
 git diff -- lab.pkt
 ```
 
-Run `ptgit init` in an existing Git repository, then commit `.gitattributes`.
-Save a change in Packet Tracer and run `git diff` to see it. Staged changes work
-with `git diff --cached`. Each clone needs its own `ptgit init`.
+Commit `.gitattributes` with your lab. Each collaborator runs `ptgit init` once
+to register the converter in their clone. Staged changes work with
+`git diff --cached`.
 
-PT Git runs offline with no third-party runtime dependencies. Packet Tracer
-doesn't need to be installed to inspect a saved lab.
+PTGit runs offline and uses the Python standard library. Packet Tracer is only
+needed to create or edit the lab.
 
 ## Commands
 
 | Command | Purpose |
 |---|---|
-| `ptgit init` | Enable readable `.pkt` diffs in this Git repository |
-| `ptgit diff old.pkt new.pkt` | Compare two saved labs |
-| `ptgit show lab.pkt` | Read a lab's configuration and topology |
-| `ptgit lint lab.pkt` | Check for common configuration problems |
-| `ptgit export lab.pkt --json` | Export a deterministic JSON snapshot |
+| `ptgit init` | Set up `.pkt` diffs in the current Git repository |
+| `ptgit diff old.pkt new.pkt` | Compare two saves |
+| `ptgit show lab.pkt` | Read configuration and topology |
+| `ptgit lint lab.pkt` | Check IPs, VLANs, and cable connections |
+| `ptgit export lab.pkt --json` | Export lab data as JSON |
 
-The default view uses running configuration. Add `--config startup` to inspect
-startup configuration instead. Git and the GitHub Action use running configuration.
+The default view uses running configuration. `diff`, `show`, `lint`, and `export`
+accept `--config startup`. Git diffs and the Action use running configuration.
 
-For scripts, `diff --exit-code` returns **1** when changes exist. `lint` returns
-**1** for errors, or for warnings with `--strict`; `lint --json` returns structured
-findings. All commands return **2** for input or setup errors and **0** on success.
-`python -m ptgit` also works.
+For scripts, `diff --exit-code` returns 1 when changes exist. `lint` returns 1
+for errors; add `--strict` to include warnings or `--json` for structured findings.
+Input and setup errors return 2. Successful commands return 0.
 
-## GitHub pull requests
+## GitHub Action
 
-The Action adds a readable diff and lint findings to the workflow's **Job Summary**,
-with a JSON report attached as an artifact.
+Add this workflow to your lab repository. Open its **Job Summary** for the diff;
+the JSON report is attached as an artifact.
 
 ```yaml
-name: PT Git
+name: PTGit
 on: [pull_request]
 permissions:
   contents: read
@@ -87,55 +82,27 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: ivanimmanuel-dev/PTGit@main
+      - uses: ivanimmanuel-dev/PTGit@v0.1.0
 ```
 
-GitHub's file view still shows a binary change; open the workflow summary for the
-PT Git diff. See [Action options and examples](docs/github-action.md).
+[Action options](docs/github-action.md) · [Git setup](docs/git-integration.md)
 
-## What gets compared
+## Compared fields
 
-- Device names, models, power state, and saved IOS configuration.
-- IP addresses, gateways, DNS, VLANs, and selected hardware-port settings.
-- Cable endpoints and cable types.
+PTGit compares device names, types, models, power state, saved IOS configuration,
+VLAN databases, host gateways and DNS, port IP settings, and cable endpoints/types.
+Layout, internal IDs, runtime counters, and device ordering are ignored.
+ACL and route-map command order is preserved.
 
-Layout changes, internal save IDs, runtime counters, and device ordering are
-ignored. ACL and route-map command order is preserved.
+Device renames appear as removal/addition. `.pka` activities, simulation events,
+IoT programs, service records, and wireless settings outside IOS are excluded.
+See the [comparison rules](docs/semantics.md) for details.
 
-A clean diff means these supported fields agree. Service data, wireless settings
-outside IOS, IoT programs, workspace notes, and simulation events aren't included.
-Device renames currently appear as removal/addition. PT Git reads `.pkt` files;
-it doesn't edit labs or handle `.pka` activities.
+## Development and license
 
-[Comparison rules](docs/semantics.md) · [Git setup details](docs/git-integration.md)
+[Contributing](CONTRIBUTING.md) covers setup and tests.
+[Release history](https://github.com/ivanimmanuel-dev/PTGit/releases) lists versions.
 
-## Tested with Packet Tracer
-
-On **Packet Tracer 9.0.1.0858**, re-saving a 10-device lab produced no semantic
-diff despite changed binary bytes. Renaming a router and removing a PC gateway
-were detected by the CLI, Git, and the local Action runner. Nine bundled Cisco
-samples also passed decoding and inspection checks.
-
-[Validation results](docs/verification.md) list the files and checks performed.
-[Help expand coverage](docs/real-lab-validation.md) with your own labs.
-
-## Development
-
-```console
-git clone https://github.com/ivanimmanuel-dev/PTGit.git
-cd PTGit
-python -m pip install -e .
-python -m unittest discover -s tests -v
-```
-
-The fixtures in `examples/` are small synthetic inputs for tests and demos.
-See [Contributing](CONTRIBUTING.md) for packaging and real-lab validation.
-
-## License and credits
-
-MIT. The decoder builds on [Unpacket](https://github.com/Punkcake21/Unpacket)
+MIT licensed. Decoding uses [Unpacket](https://github.com/Punkcake21/Unpacket)
 and [pktforge](https://github.com/Schryzon/pktforge).
-[Third-party notices](THIRD_PARTY_NOTICES.md) include their licenses and attribution.
-
-[Changelog](CHANGELOG.md) · [Security](SECURITY.md) ·
-[Release notes](docs/release-notes-v0.1.0.md)
+See [third-party notices](THIRD_PARTY_NOTICES.md) and [security reporting](SECURITY.md).

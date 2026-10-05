@@ -1,4 +1,4 @@
-"""Shared comparison results for automation and release validation."""
+"""Compare lab snapshots and summarize changes."""
 
 from collections import Counter, defaultdict
 from dataclasses import asdict

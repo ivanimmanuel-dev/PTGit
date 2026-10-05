@@ -32,7 +32,7 @@ def initialize(path: str | Path = ".", force: bool = False) -> Path:
     root = Path(found.stdout.strip())
     attrs = root / ".gitattributes"
     if attrs.is_symlink():
-        raise PTGitError("Refusing to replace a symlinked .gitattributes.")
+        raise PTGitError(".gitattributes is a symlink. Use a regular file before running init.")
     try:
         original = attrs.read_bytes() if attrs.exists() else b""
         content = original.decode("utf-8-sig")

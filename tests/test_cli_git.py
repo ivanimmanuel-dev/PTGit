@@ -9,6 +9,7 @@ import unittest
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
+FIXTURES = ROOT / "tests" / "fixtures"
 
 
 def run_cli(*args, cwd=ROOT):
@@ -23,7 +24,7 @@ class CLITests(unittest.TestCase):
         self.assertEqual(run_cli("--version").stdout.strip(), "ptgit 0.1.0")
 
     def test_show_export_lint_and_no_input_mutation(self):
-        path = ROOT / "examples/new.pkt"
+        path = FIXTURES / "new.pkt"
         before = path.read_bytes()
         self.assertIn("R1", run_cli("show", path).stdout)
         exported = run_cli("export", path, "--json")
@@ -35,7 +36,7 @@ class CLITests(unittest.TestCase):
         self.assertEqual(before, path.read_bytes())
 
     def test_diff_exit_codes(self):
-        old, new = ROOT / "examples/old.pkt", ROOT / "examples/new.pkt"
+        old, new = FIXTURES / "old.pkt", FIXTURES / "new.pkt"
         self.assertEqual(run_cli("diff", old, new).returncode, 0)
         self.assertEqual(run_cli("diff", old, new, "--exit-code").returncode, 1)
         self.assertEqual(run_cli("diff", new, new, "--exit-code").returncode, 0)
@@ -46,7 +47,7 @@ class CLITests(unittest.TestCase):
         self.assertNotIn("Traceback", result.stderr)
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "broken.pkt"
-            data = bytearray((ROOT / "examples/new.pkt").read_bytes())
+            data = bytearray((FIXTURES / "new.pkt").read_bytes())
             data[len(data) // 2] ^= 1
             path.write_bytes(data)
             result = run_cli("show", path)
@@ -57,7 +58,7 @@ class CLITests(unittest.TestCase):
     def test_extensionless_textconv(self):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "git-blob"
-            shutil.copyfile(ROOT / "examples/new.pkt", path)
+            shutil.copyfile(FIXTURES / "new.pkt", path)
             result = run_cli("textconv", path)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("Topology", result.stdout)
@@ -102,10 +103,10 @@ class GitIntegrationTests(unittest.TestCase):
         setup = run_cli("init", self.repo)
         self.assertEqual(setup.returncode, 0, setup.stderr)
         path = self.repo / "lab with spaces.pkt"
-        shutil.copyfile(ROOT / "examples/old.pkt", path)
+        shutil.copyfile(FIXTURES / "old.pkt", path)
         self.git("add", ".")
         self.git("commit", "-qm", "before")
-        shutil.copyfile(ROOT / "examples/new.pkt", path)
+        shutil.copyfile(FIXTURES / "new.pkt", path)
         output = self.git("diff", "--", path.name)
         self.assertIn("switchport access vlan 20", output)
         self.assertNotIn("Binary files", output)
@@ -119,7 +120,7 @@ class GitIntegrationTests(unittest.TestCase):
     def test_git_diff_ignores_layout_only(self):
         self.assertEqual(run_cli("init", self.repo).returncode, 0)
         path = self.repo / "lab.pkt"
-        path.write_bytes((ROOT / "examples/new.xml").read_bytes())
+        path.write_bytes((FIXTURES / "new.xml").read_bytes())
         self.git("add", ".")
         self.git("commit", "-qm", "before")
         path.write_bytes(path.read_bytes().replace(b"<X>800</X>", b"<X>9999</X>"))
@@ -153,10 +154,10 @@ class GitIntegrationTests(unittest.TestCase):
         self.assertEqual(setup(moved, "--force").returncode, 0)
         self.assertEqual(self.git("config", "diff.other.textconv").strip(), "other-converter")
         path = self.repo / "moved lab.pkt"
-        shutil.copyfile(ROOT / "examples/old.pkt", path)
+        shutil.copyfile(FIXTURES / "old.pkt", path)
         self.git("add", ".gitattributes", path.name)
         self.git("commit", "-qm", "before")
-        shutil.copyfile(ROOT / "examples/new.pkt", path)
+        shutil.copyfile(FIXTURES / "new.pkt", path)
         self.assertIn("10.10.20.1/24", self.git("diff", "--", path.name))
 
     def test_global_config_is_unchanged(self):

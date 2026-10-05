@@ -13,20 +13,20 @@ from .render import diff, show, visible
 
 
 def parser() -> argparse.ArgumentParser:
-    result = argparse.ArgumentParser(prog="ptgit", description="Meaningful Git diffs for Packet Tracer labs.")
+    result = argparse.ArgumentParser(prog="ptgit", description="Readable diffs for Packet Tracer labs.")
     result.add_argument("--version", action="version", version=f"ptgit {__version__}")
     commands = result.add_subparsers(dest="command", required=True)
-    init = commands.add_parser("init", help="Install textconv in an existing Git working tree")
+    init = commands.add_parser("init", help="Enable .pkt diffs in a Git repository")
     init.add_argument("directory", nargs="?", default=".")
     init.add_argument("--force", action="store_true", help="Replace an existing ptgit driver")
     comparison = commands.add_parser("diff", help="Compare topology and device configurations")
     comparison.add_argument("old")
     comparison.add_argument("new")
-    comparison.add_argument("--exit-code", action="store_true", help="Exit 1 when semantic differences exist")
-    for name, help_text in (("show", "Show a stable semantic snapshot"),
-                            ("lint", "Check structural and common configuration mistakes"),
-                            ("export", "Export the semantic model as JSON"),
-                            ("textconv", "Git's stable text conversion entry point")):
+    comparison.add_argument("--exit-code", action="store_true", help="Exit 1 when changes exist")
+    for name, help_text in (("show", "Read device configuration and topology"),
+                            ("lint", "Check IPs, VLANs, and cable connections"),
+                            ("export", "Export lab data as JSON"),
+                            ("textconv", "Convert a lab for Git diffs")):
         command = commands.add_parser(name, help=help_text)
         command.add_argument("file")
         if name in {"lint", "export"}:
@@ -48,7 +48,7 @@ def main(argv=None) -> int:
     try:
         if args.command == "init":
             root = initialize(args.directory, args.force)
-            print(f"PT Git enabled in {root}. Commit .gitattributes; run ptgit init in each clone.")
+            print(f"PTGit enabled in {root}.")
             return 0
         config = getattr(args, "config", "running")
         if args.command == "diff":
@@ -56,7 +56,7 @@ def main(argv=None) -> int:
             if output:
                 print(output, end="")
             else:
-                print("No changes in supported fields.")
+                print("No changes.")
             return 1 if output and args.exit_code else 0
         snapshot = load_snapshot(args.file, config)
         if args.command in {"show", "textconv"}:
@@ -73,7 +73,9 @@ def main(argv=None) -> int:
                     print(format_finding(f) + "\n")
                 errors = sum(f.severity == "error" for f in findings)
                 warnings = sum(f.severity == "warning" for f in findings)
-                print(f"{errors} error(s), {warnings} warning(s).")
+                error_label = "error" if errors == 1 else "errors"
+                warning_label = "warning" if warnings == 1 else "warnings"
+                print(f"{errors} {error_label}, {warnings} {warning_label}.")
             return int(any(f.severity == "error" or (args.strict and f.severity == "warning") for f in findings))
         return 0
     except (PTGitError, OSError) as exc:

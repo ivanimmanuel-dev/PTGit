@@ -1,6 +1,6 @@
 name: PT Git Diff
-description: Meaningful Packet Tracer changes in GitHub Job Summaries
-author: PT Git contributors
+description: Compare Packet Tracer labs in GitHub pull requests
+author: Ivan Immanuel
 branding:
   icon: git-pull-request
   color: blue
@@ -18,14 +18,14 @@ inputs:
     description: Maximum decode/compare time per file pair (1-120)
     default: '30'
   fail-on-lint:
-    description: Fail on static lint errors as well as decode failures
+    description: Fail when lint reports errors
     default: 'false'
   upload-artifact:
-    description: Upload deterministic JSON and the rendered summary
+    description: Upload the JSON report and summary
     default: 'true'
 outputs:
   report:
-    description: Absolute path to the deterministic JSON report
+    description: Path to report.json
     value: ${{ steps.report.outputs.report }}
   changed-files:
     description: Number of changed .pkt paths in the PR
@@ -36,7 +36,7 @@ runs:
     - uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-    - name: Analyze Packet Tracer changes
+    - name: Compare Packet Tracer labs
       id: report
       shell: bash
       env:
@@ -47,7 +47,7 @@ runs:
         PTGIT_TIMEOUT: ${{ inputs.timeout-seconds }}
         PTGIT_FAIL_ON_LINT: ${{ inputs.fail-on-lint }}
       run: python -I "$PTGIT_ACTION_PATH/scripts/action_entry.py"
-    - name: Upload PT Git report
+    - name: Upload PTGit report
       if: ${{ always() && inputs.upload-artifact == 'true' && steps.report.outputs.report != '' }}
       uses: actions/upload-artifact@v4
       with:

@@ -71,14 +71,14 @@ def sections(snapshot: Snapshot) -> list[tuple[str, list[str]]]:
 
 
 def show(snapshot: Snapshot) -> str:
-    lines = [f"PT Git semantic snapshot v1 ({snapshot.config_source} config)"]
+    lines = [f"PTGit lab ({snapshot.config_source} configuration)"]
     for title, content in sections(snapshot):
         lines.extend(["", title])
         lines.extend("  " + line for line in content)
     # Fingerprint the complete modeled structure, including context boundaries
     # and duplicate identities that a human display may otherwise conflate.
     canonical = json.dumps(snapshot.semantic_dict(), sort_keys=True, ensure_ascii=True).encode()
-    lines.extend(["", "Modeled fields SHA-256: " + hashlib.sha256(canonical).hexdigest()])
+    lines.extend(["", "Snapshot SHA-256: " + hashlib.sha256(canonical).hexdigest()])
     return "\n".join(lines) + "\n"
 
 

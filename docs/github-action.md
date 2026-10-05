@@ -1,14 +1,15 @@
 # GitHub Action
 
-PT Git compares changed `.pkt` files in a pull request and writes the diff to the
-workflow's Job Summary. It also uploads `report.json` and `summary.md` as an artifact.
+**PT Git Diff** compares `.pkt` files changed in a pull request. The diff and
+lint findings appear in the workflow's Job Summary. `report.json` and
+`summary.md` are uploaded as an artifact.
 
 ## Setup
 
 Add `.github/workflows/ptgit.yml` to your lab repository:
 
 ```yaml
-name: PT Git
+name: PTGit
 on: [pull_request]
 permissions:
   contents: read
@@ -21,68 +22,55 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: ivanimmanuel-dev/PTGit@main
+      - uses: ivanimmanuel-dev/PTGit@v0.1.0
 ```
 
-The Action uses Python 3.12 on Ubuntu. Replace `main` with a reviewed full commit
-SHA to pin a version. Fork pull requests work with read-only permissions.
+The Action uses Python 3.12 on Ubuntu. A full commit SHA can replace the version
+tag. GitHub's Files changed tab still shows binary files; open the Job Summary
+to read the comparison.
 
-Open the workflow run's summary to read the diff. GitHub's Files changed tab
-continues to show the original binary files.
+## Inputs
 
-## Options
-
-| Input | Default | Meaning |
+| Input | Default | Description |
 |---|---|---|
 | `base`, `head` | Pull request commit IDs | Full commit SHAs available in the checkout |
-| `max-files` | `40` | Maximum changed labs to inspect, from 1 to 100 |
-| `timeout-seconds` | `30` | Comparison timeout per lab pair, from 1 to 120 seconds |
-| `fail-on-lint` | `false` | Fail the step when lint finds errors |
+| `max-files` | `40` | Changed labs to inspect, from 1 to 100 |
+| `timeout-seconds` | `30` | Seconds per lab comparison, from 1 to 120 |
+| `fail-on-lint` | `false` | Fail when lint reports errors |
 | `upload-artifact` | `true` | Upload JSON and summary with 14-day retention |
 
-Outputs are `report`, the JSON report path, and `changed-files`, the number of
-changed lab paths. For example:
-
 ```yaml
-- uses: ivanimmanuel-dev/PTGit@main
+- uses: ivanimmanuel-dev/PTGit@v0.1.0
   id: ptgit
   with:
     fail-on-lint: 'true'
     max-files: '20'
 ```
 
-## Report behavior
+Outputs: `report` is the path to `report.json`; `changed-files` is the number of
+changed lab paths.
 
-Comparison uses the common ancestor of `base` and `head`, through `head`. Added,
-removed, modified, renamed, and type-changed `.pkt` paths are included. File
-extensions are matched case-insensitively. A filename-only rename can produce
-an empty semantic diff.
+## Reports
 
-Each lab gets device/link counts, a diff, and lint findings. Decode failures fail
-the step while preserving the other file reports. A run with no changed labs
-succeeds.
+Comparison runs from the common ancestor of `base` and `head` to `head`. It
+includes added, removed, modified, renamed, and type-changed `.pkt` files.
+A filename-only rename can have an empty lab diff. Decode failures fail the
+step and appear alongside results for the other files.
 
-Reports use the same comparison code as the CLI and are deterministic for the
-same inputs and options. The JSON includes commit IDs, tool and schema versions,
-and sorted file records. Previews include up to 80,000 diff characters and 100
-findings per lab; truncation is marked and counts remain complete. Summaries
-above 900,000 bytes direct users to the artifact.
+JSON includes commit IDs, tool/schema versions, counts, diffs, and lint findings.
+Records are sorted. Previews contain up to 80,000 diff characters and 100
+findings per lab; totals include findings beyond the preview. Large summaries
+direct you to the report artifact.
 
-The artifact is named `ptgit-report-<job>-<run_attempt>`. Use one Action invocation
-per job to avoid artifact-name collisions.
+Artifacts are named `ptgit-report-<job>-<run_attempt>`. Use one invocation per
+job. With `upload-artifact: 'false'`, the Job Summary is still written.
+Common IOS credentials are masked in both reports; see
+[configuration data](../SECURITY.md#configuration-data).
 
-Common IOS credentials are masked in both outputs; other saved values remain.
-Disabling artifact upload leaves the Job Summary enabled. See [Security](../SECURITY.md)
-for report visibility and runner guidance.
+## Local reports
 
-## Run locally
-
-From the PT Git source checkout:
+From the source checkout:
 
 ```console
 python -I scripts/action_entry.py --repo /path/to/labs --base FULL_BASE_SHA --head FULL_HEAD_SHA --output-dir /path/to/report
 ```
-
-This writes the two report files locally. The runner requires the source checkout,
-including its worker script. CI also runs the composite Action against two fixture
-commits and checks the resulting report.

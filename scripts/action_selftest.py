@@ -7,6 +7,7 @@ import shutil
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
+FIXTURES = ROOT / "tests" / "fixtures"
 
 
 def git(*args):
@@ -21,11 +22,11 @@ def prepare():
     git("config", "--local", "user.name", "PT Git self-test")
     git("config", "--local", "user.email", "selftest@example.invalid")
     lab = folder / "lab with spaces.pkt"
-    shutil.copyfile(ROOT / "examples/old.pkt", lab)
+    shutil.copyfile(FIXTURES / "old.pkt", lab)
     git("add", "--", str(lab))
     git("commit", "-qm", "PT Git Action fixture before")
     base = git("rev-parse", "HEAD")
-    shutil.copyfile(ROOT / "examples/new.pkt", lab)
+    shutil.copyfile(FIXTURES / "new.pkt", lab)
     git("add", "--", str(lab))
     git("commit", "-qm", "PT Git Action fixture after")
     head = git("rev-parse", "HEAD")

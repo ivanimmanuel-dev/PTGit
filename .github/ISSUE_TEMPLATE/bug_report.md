@@ -1,23 +1,20 @@
 ---
 name: Bug report
-about: Report a decoding, comparison, lint, or Git integration problem
+about: Report a PTGit bug
 ---
 
-## What happened?
+## Command and output
 
-Include the command, its output, and what you expected.
+## Expected result
 
 ## Versions
 
-- PT Git:
+- PTGit:
 - Python:
-- OS and Git:
-- Packet Tracer (Help → About):
+- Operating system and Git:
+- Packet Tracer build (Help → About):
 
-## Example
+## Steps to reproduce
 
-Attach a small lab you can share, or paste the relevant configuration and diff.
-Remove credentials and private material. If the problem involves a save or
-re-save, describe the steps used to create both files.
-
-For vulnerabilities, use the private reporting link in [SECURITY.md](../../SECURITY.md).
+Attach a small lab pair or paste the relevant configuration and diff.
+For vulnerabilities, use [private reporting](https://github.com/ivanimmanuel-dev/PTGit/security/advisories/new).

@@ -1,23 +1,18 @@
 # Git integration
 
-Run `ptgit init` in a Git repository, or pass its path:
+From a Git repository, enable PTGit and commit the file attributes:
 
 ```console
-ptgit init /path/to/networking-labs
-```
-
-From that repository, commit the generated attributes:
-
-```console
+ptgit init
 git add .gitattributes
 git commit -m "Enable Packet Tracer diffs"
 ```
 
-PT Git adds rules for `*.pkt` and `*.PKT` to `.gitattributes` and installs a local
-textconv driver. Existing attributes and unrelated drivers are preserved. Global
-Git configuration is unchanged.
+You can also pass a repository path: `ptgit init /path/to/labs`.
+Setup adds `*.pkt` and `*.PKT` rules and registers a local textconv driver.
+Existing attributes and other diff drivers are preserved.
 
-After editing and saving a lab:
+After saving a lab:
 
 ```console
 git diff -- lab.pkt
@@ -25,37 +20,31 @@ git add lab.pkt
 git diff --cached -- lab.pkt
 ```
 
-`ptgit textconv` also accepts the extensionless temporary files Git creates.
-Git stores the original binary bytes; the readable diff is for review and cannot
-be applied as a text patch.
+Git stores the original `.pkt` bytes. Textconv produces the readable review;
+its output is not a text patch for editing the binary file.
 
-## Clones and installation changes
+## Clones and Python changes
 
-Commit `.gitattributes` so Git knows which files use PT Git. Each collaborator
-then runs `ptgit init` to register their installed converter.
-
-The driver stores absolute Python and converter paths. After moving the source
-tree or changing Python installations, refresh it:
+Each clone needs `ptgit init`. The driver points to the installed Python and
+converter, so refresh it after moving either:
 
 ```console
 ptgit init --force
 ```
 
-Repeating setup is safe. Paths containing spaces are supported. Textconv output
-is not cached in Git notes.
+Paths with spaces are supported. Setup changes repository-local Git settings.
 
-## Existing Git settings
+## Troubleshooting
 
-The PT Git attribute block is appended after existing rules. Nested
-`.gitattributes` files can still override it. Inspect the effective driver with:
+Check which attributes apply to a lab:
 
 ```console
 git check-attr diff text -- lab.pkt
 ```
 
-A different `diff.ptgit.textconv` requires `--force` to replace. An external
-`diff.ptgit.command` takes precedence over textconv, so setup reports the conflict.
-Remove that setting at the scope where it was configured, then rerun setup.
+Nested `.gitattributes` files can override the repository rules. An existing
+`diff.ptgit.textconv` requires `--force` to replace. An external
+`diff.ptgit.command` overrides textconv; remove that setting at its original
+scope before running setup.
 
-GitHub does not run local textconv. Use the [GitHub Action](github-action.md) to
-show these diffs in pull requests.
+GitHub does not run textconv. Use the [Action](github-action.md) for pull requests.

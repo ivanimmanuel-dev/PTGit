@@ -1,4 +1,4 @@
-"""Trusted Action entry point. Use -I to exclude the PR's import paths."""
+"""Run the Action with -I to isolate imports from the lab checkout."""
 from pathlib import Path
 import sys
 

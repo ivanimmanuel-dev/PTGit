@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "packet-tracer-git"
 version = "0.1.0"
-description = "Git-native semantic diffs for Cisco Packet Tracer labs"
+description = "Readable Git diffs for Cisco Packet Tracer labs"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE", "ptgit/_vendor/unpacket/LICENSE", "ptgit/_vendor/pktforge-LICENSE", "THIRD_PARTY_NOTICES.md"]
-authors = [{name = "PT Git contributors"}]
+authors = [{name = "Ivan Immanuel"}]
 dependencies = []
 keywords = ["packet-tracer", "cisco", "git", "networking", "semantic-diff"]
 classifiers = [

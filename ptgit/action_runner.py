@@ -114,7 +114,7 @@ def compare_blob_pair(repo, entry, timeout, worker):
                 try:
                     reason = json.loads(process.stdout)["error"]
                 except (ValueError, KeyError):
-                    reason = "The isolated comparison failed (resource limit or unexpected input)."
+                    reason = f"Comparison process exited with code {process.returncode}."
                 raise PTGitError(reason)
             row.update(json.loads(process.stdout))
             row["status"] = "ok"
@@ -131,7 +131,7 @@ def code(value):
 
 
 def summary(report):
-    lines = ["# PT Git — Packet Tracer changes"]
+    lines = ["# PTGit — Packet Tracer changes"]
     if not report["files"]:
         lines.append("No changed `.pkt` files.")
     for row in report["files"]:
@@ -151,20 +151,19 @@ def summary(report):
             f"Links removed:   {counts['links_removed']}",
             f"Warnings:        {counts['warnings']}",
             f"Lint errors:     {counts['lint_errors']}"])),
-            code(row["diff"] or "No changes in supported fields.")])
+            code(row["diff"] or "No changes.")])
         if row["diff_truncated"]:
-            lines.append("Diff preview truncated at 80,000 characters; inspect locally for the full view.")
+            lines.append("Showing the first 80,000 diff characters. Run ptgit diff locally for the full output.")
         if row["findings"]:
             lines.append(code("\n".join(f"{f['severity'].upper()} {f['code']} {f['location']}: {f['message']}"
                                         for f in row["findings"])))
         if row["findings_truncated"]:
             lines.append("Only the first 100 lint findings are displayed; counts include all findings.")
-    lines.append("Common IOS credentials are masked; other saved values are included.")
     rendered = "\n\n".join(lines) + "\n"
     # GitHub permits at most 1 MiB per step summary. Keep well below that bound,
     # truncating only between complete lab sections so HTML always stays closed.
     if len(rendered.encode("utf-8", "backslashreplace")) > 900_000:
-        return "# PT Git — Packet Tracer changes\n\nThe report exceeds the Job Summary budget. Download the JSON artifact or inspect locally.\n"
+        return "# PTGit — Packet Tracer changes\n\nDownload the JSON artifact to view this report; it exceeds the Job Summary size limit.\n"
     return rendered
 
 
@@ -212,15 +211,17 @@ def main(argv=None):
         if os.environ.get("GITHUB_OUTPUT"):
             with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as stream:
                 stream.write(f"report={report_path.resolve()}\nsummary={summary_path.resolve()}\nchanged-files={len(report['files'])}\n")
-        print(f"PT Git inspected {len(report['files'])} changed .pkt file(s).")
+        count = len(report["files"])
+        label = "lab" if count == 1 else "labs"
+        print(f"PTGit inspected {count} changed {label}.")
         return int(any(row["status"] == "error" or
                        (os.environ.get("PTGIT_FAIL_ON_LINT", "false").lower() == "true" and row.get("counts", {}).get("lint_errors", 0))
                        for row in report["files"]))
     except (PTGitError, OSError, ValueError, subprocess.TimeoutExpired) as exc:
-        print(f"PT Git action: {exc}", file=sys.stderr)
+        print(f"PTGit: {exc}", file=sys.stderr)
         if os.environ.get("GITHUB_STEP_SUMMARY"):
             with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as stream:
-                stream.write("# PT Git — unable to compare\n\n" + code(str(exc)))
+                stream.write("# PTGit — comparison failed\n\n" + code(str(exc)))
         return 2
 
 

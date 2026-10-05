@@ -13,17 +13,18 @@ from ptgit.model import load_snapshot, parse_snapshot
 from ptgit.render import diff, show
 
 ROOT = Path(__file__).resolve().parents[1]
+FIXTURES = ROOT / "tests" / "fixtures"
 
 
 def example(name="new"):
-    return ET.parse(ROOT / "examples" / f"{name}.xml").getroot()
+    return ET.parse(FIXTURES / f"{name}.xml").getroot()
 
 
 class SemanticTests(unittest.TestCase):
     def test_actual_binary_decoder_matches_xml(self):
         for name in ("old", "new"):
-            binary = load_snapshot(ROOT / "examples" / f"{name}.pkt")
-            xml = load_snapshot(ROOT / "examples" / f"{name}.xml")
+            binary = load_snapshot(FIXTURES / f"{name}.pkt")
+            xml = load_snapshot(FIXTURES / f"{name}.xml")
             self.assertEqual(binary.to_dict(), xml.to_dict())
 
     def test_requested_changes_are_visible(self):
@@ -34,8 +35,8 @@ class SemanticTests(unittest.TestCase):
             self.assertIn(value, output)
 
     def test_legacy_decoder_matches_modern(self):
-        self.assertEqual(load_snapshot(ROOT / "examples/old-legacy.pkt").to_dict(),
-                         load_snapshot(ROOT / "examples/old.pkt").to_dict())
+        self.assertEqual(load_snapshot(FIXTURES / "old-legacy.pkt").to_dict(),
+                         load_snapshot(FIXTURES / "old.pkt").to_dict())
 
     def test_layout_ids_device_order_and_cable_direction_do_not_change_text(self):
         before = example()

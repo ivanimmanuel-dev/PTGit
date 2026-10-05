@@ -27,13 +27,6 @@
 ##
 ## The above copyright notice must not be removed.
 ##
-## Information
-## ===========
-##
-## Anyone thinking of using this code should reconsider. It's slow.
-## Try python-mcrypt instead. In case a faster library is not installed
-## on the target system, this code can be used as a portable fallback.
-
 # pylint: disable-all
 
 block_size = 16

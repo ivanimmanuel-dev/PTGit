@@ -17,7 +17,7 @@ from .limits import (MAX_FIELD_CHARS, MAX_NAME_CHARS, MAX_DEVICES, MAX_LINKS,
 def text(node: ET.Element, path: str, default: str = "") -> str:
     value = (node.findtext(path) or default).strip()
     if len(value) > MAX_FIELD_CHARS:
-        raise PTGitError("Modeled field exceeds the 65,536-character semantic limit.")
+        raise PTGitError("Field exceeds the 65,536-character limit.")
     return value
 
 
@@ -117,7 +117,7 @@ def parse_snapshot(root: ET.Element, config_source: str = "running") -> Snapshot
     for index, raw in enumerate(raw_devices):
         engine = raw.find("ENGINE")
         if engine is None:
-            raise PTGitError(f"Device {index + 1} has no ENGINE; refusing an incomplete comparison.")
+            raise PTGitError(f"Device {index + 1} is missing its ENGINE element.")
         name = text(engine, "NAME") or f"<unnamed-device-{index + 1}>"
         if len(name) > MAX_NAME_CHARS:
             raise PTGitError("Device name exceeds the 256-character limit.")
@@ -139,7 +139,7 @@ def parse_snapshot(root: ET.Element, config_source: str = "running") -> Snapshot
         if config_node is not None:
             for line in config_node.findall("LINE"):
                 if len(line.text or "") > MAX_FIELD_CHARS:
-                    raise PTGitError("Configuration field exceeds the 65,536-character semantic limit.")
+                    raise PTGitError("Configuration line exceeds the 65,536-character limit.")
                 config_lines.extend((line.text or "").replace("\r\n", "\n").split("\n"))
                 if config_line_count + len(config_lines) > MAX_CONFIG_LINES:
                     raise PTGitError("Lab exceeds the 50,000-configuration-line limit.")

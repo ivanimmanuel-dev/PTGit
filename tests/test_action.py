@@ -11,6 +11,7 @@ from ptgit.action_runner import analyze, summary, redact
 from ptgit.errors import PTGitError
 
 ROOT = Path(__file__).resolve().parents[1]
+FIXTURES = ROOT / "tests" / "fixtures"
 
 
 @unittest.skipUnless(shutil.which("git"), "Git required")
@@ -23,7 +24,7 @@ class ActionTests(unittest.TestCase):
         self.git("config", "user.name", "PT Git tests")
         self.git("config", "user.email", "test@example.invalid")
         for name in ("lab.pkt", "removed.pkt", "rename source.pkt"):
-            shutil.copyfile(ROOT / "examples/old.pkt", self.repo / name)
+            shutil.copyfile(FIXTURES / "old.pkt", self.repo / name)
         (self.repo / "removed.pkt").write_text("<PACKETTRACER5><NETWORK><DEVICES><DEVICE><ENGINE><NAME>Gone</NAME></ENGINE></DEVICE></DEVICES></NETWORK></PACKETTRACER5>")
         self.git("add", ".")
         self.git("commit", "-qm", "base")
@@ -42,8 +43,8 @@ class ActionTests(unittest.TestCase):
         return self.git("rev-parse", "HEAD").strip()
 
     def test_modify_add_delete_rename_and_deterministic_json(self):
-        shutil.copyfile(ROOT / "examples/new.pkt", self.repo / "lab.pkt")
-        shutil.copyfile(ROOT / "examples/new.pkt", self.repo / "added [lab].PKT")
+        shutil.copyfile(FIXTURES / "new.pkt", self.repo / "lab.pkt")
+        shutil.copyfile(FIXTURES / "new.pkt", self.repo / "added [lab].PKT")
         (self.repo / "removed.pkt").unlink()
         (self.repo / "rename source.pkt").rename(self.repo / "renamed lab.pkt")
         head = self.commit()
@@ -61,7 +62,7 @@ class ActionTests(unittest.TestCase):
 
     def test_corrupt_lab_fails_without_hiding_other_results(self):
         (self.repo / "bad.pkt").write_bytes(b"not a packet tracer lab")
-        shutil.copyfile(ROOT / "examples/new.pkt", self.repo / "lab.pkt")
+        shutil.copyfile(FIXTURES / "new.pkt", self.repo / "lab.pkt")
         report = analyze(self.repo, self.base, self.commit())
         self.assertEqual([r["status"] for r in report["files"]], ["error", "ok"])
 
@@ -82,20 +83,20 @@ class ActionTests(unittest.TestCase):
 
     def test_file_count_cap_is_explicit(self):
         for name in ("one.pkt", "two.pkt"):
-            shutil.copyfile(ROOT / "examples/new.pkt", self.repo / name)
+            shutil.copyfile(FIXTURES / "new.pkt", self.repo / name)
         with self.assertRaisesRegex(PTGitError, "exceed"):
             analyze(self.repo, self.base, self.commit(), max_files=1)
 
     def test_worker_timeout_is_reported(self):
         worker = self.repo / "slow_worker.py"
         worker.write_text("import time\ntime.sleep(10)\n", encoding="utf-8")
-        shutil.copyfile(ROOT / "examples/new.pkt", self.repo / "lab.pkt")
+        shutil.copyfile(FIXTURES / "new.pkt", self.repo / "lab.pkt")
         report = analyze(self.repo, self.base, self.commit(), timeout=1, worker=worker)
         self.assertEqual(report["files"][0]["status"], "error")
         self.assertIn("exceeded", report["files"][0]["error"])
 
     def test_entry_writes_summary_outputs_and_isolates_pr_imports(self):
-        shutil.copyfile(ROOT / "examples/new.pkt", self.repo / "lab.pkt")
+        shutil.copyfile(FIXTURES / "new.pkt", self.repo / "lab.pkt")
         for name in ("json.py", "subprocess.py", "sitecustomize.py"):
             (self.repo / name).write_text("raise RuntimeError('PR import must not run')\n")
         head = self.commit()
@@ -106,7 +107,7 @@ class ActionTests(unittest.TestCase):
                                  "--repo", str(self.repo), "--base", self.base, "--head", head,
                                  "--output-dir", str(output)], cwd=self.repo, env=env, capture_output=True)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("PT Git", (self.repo / "summary-file").read_text(encoding="utf-8"))
+        self.assertIn("PTGit", (self.repo / "summary-file").read_text(encoding="utf-8"))
         self.assertIn("changed-files=1", (self.repo / "outputs-file").read_text())
         self.assertTrue((output / "report.json").exists())
 

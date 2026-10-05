@@ -9,6 +9,7 @@ import tempfile
 import venv
 
 ROOT = Path(__file__).resolve().parents[1]
+FIXTURES = ROOT / "tests" / "fixtures"
 
 
 def check(wheel):
@@ -37,10 +38,10 @@ def check(wheel):
         assert run(python, "-m", "ptgit", "--version") == run(cli, "--version")
         imported = run(python, "-c", "import ptgit; print(ptgit.__file__)").strip()
         assert environment.resolve() in Path(imported).resolve().parents, imported
-        old, new = ROOT / "examples/old.pkt", ROOT / "examples/new.pkt"
+        old, new = FIXTURES / "old.pkt", FIXTURES / "new.pkt"
         assert "R1" in run(cli, "show", new)
         assert json.loads(run(cli, "export", new, "--json"))["schema_version"] == 1
-        assert "0 error(s)" in run(cli, "lint", new)
+        assert "0 errors" in run(cli, "lint", new)
         assert "10.10.20.1/24" in run(cli, "diff", old, new, "--exit-code", expected=1)
         run("git", "init", "-q")
         run("git", "config", "--local", "user.name", "PT Git verification")
