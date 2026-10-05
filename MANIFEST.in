@@ -1,0 +1,7 @@
+include LICENSE THIRD_PARTY_NOTICES.md CHANGELOG.md SECURITY.md CONTRIBUTING.md action.yml
+include .gitignore .gitattributes
+recursive-include .github *.yml *.md
+recursive-include docs *.md *.json *.html *.cast *.txt
+recursive-include examples *.xml *.pkt *.txt *.json
+recursive-include tests *.py
+recursive-include scripts *.py

@@ -1,0 +1,53 @@
+name: Release
+on:
+  push:
+    tags: ['v0.*']
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the selected version tag to PyPI after environment approval
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  checks:
+    uses: ./.github/workflows/tests.yml
+  build:
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install build twine
+      - name: Verify selected version tag
+        env:
+          RELEASE_REF: ${{ github.ref }}
+        run: python -c 'import os, ptgit; r=os.environ["RELEASE_REF"]; assert not r.startswith("refs/tags/") or r == "refs/tags/v" + ptgit.__version__, "Tag/version mismatch"'
+      - run: python -m build
+      - run: python -m twine check dist/*
+      - run: python scripts/check_install.py dist/packet_tracer_git-0.1.0-py3-none-any.whl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: python-distributions
+          path: dist/*
+          if-no-files-found: error
+  publish:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish && startsWith(github.ref, 'refs/tags/v0.')
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/packet-tracer-git/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-distributions
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@release/v1

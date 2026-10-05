@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "packet-tracer-git"
+version = "0.1.0"
+description = "Git-native semantic diffs for Cisco Packet Tracer labs"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE", "ptgit/_vendor/unpacket/LICENSE", "ptgit/_vendor/pktforge-LICENSE", "THIRD_PARTY_NOTICES.md"]
+authors = [{name = "PT Git contributors"}]
+dependencies = []
+keywords = ["packet-tracer", "cisco", "git", "networking", "semantic-diff"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Software Development :: Version Control :: Git",
+]
+
+[project.urls]
+Homepage = "https://github.com/ivanimmanuel-dev/PTGit"
+Repository = "https://github.com/ivanimmanuel-dev/PTGit"
+Issues = "https://github.com/ivanimmanuel-dev/PTGit/issues"
+
+[project.scripts]
+ptgit = "ptgit.cli:main"
+
+[tool.setuptools]
+packages = ["ptgit", "ptgit._vendor", "ptgit._vendor.unpacket"]
+include-package-data = false
+
+[tool.setuptools.package-data]
+"ptgit._vendor.unpacket" = ["LICENSE"]
+"ptgit._vendor" = ["pktforge-LICENSE"]

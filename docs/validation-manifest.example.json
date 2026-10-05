@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "packet_tracer_build": "REPLACE with exact Help > About version/build",
+  "provenance": "packet-tracer-gui",
+  "notes": "Record the OS and any incidental changes here. See docs/real-lab-validation.md.",
+  "cases": [
+    {
+      "id": "resave",
+      "before": "baseline.pkt",
+      "after": "resaved.pkt",
+      "config": "running",
+      "expect_semantic_change": false
+    },
+    {
+      "id": "hostname",
+      "before": "baseline.pkt",
+      "after": "hostname.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "ipv4",
+      "before": "baseline.pkt",
+      "after": "ipv4.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "mask",
+      "before": "baseline.pkt",
+      "after": "mask.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "shutdown",
+      "before": "baseline.pkt",
+      "after": "shutdown.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "no-shutdown",
+      "before": "shutdown.pkt",
+      "after": "no-shutdown.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "cable-added",
+      "before": "baseline.pkt",
+      "after": "cable-added.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "cable-removed",
+      "before": "baseline.pkt",
+      "after": "cable-removed.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "access-vlan",
+      "before": "baseline.pkt",
+      "after": "access-vlan.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "vlan-created",
+      "before": "baseline.pkt",
+      "after": "vlan-added.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "vlan-removed",
+      "before": "vlan-added.pkt",
+      "after": "vlan-removed.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "static-route",
+      "before": "baseline.pkt",
+      "after": "route.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "dhcp",
+      "before": "baseline.pkt",
+      "after": "dhcp.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "acl",
+      "before": "baseline.pkt",
+      "after": "acl.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "display-rename",
+      "before": "baseline.pkt",
+      "after": "renamed.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "device-added",
+      "before": "baseline.pkt",
+      "after": "device-added.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "device-removed",
+      "before": "device-added.pkt",
+      "after": "device-removed.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "running-only",
+      "before": "baseline.pkt",
+      "after": "running-only.pkt",
+      "config": "running",
+      "expect_semantic_change": true
+    },
+    {
+      "id": "startup-unchanged",
+      "before": "baseline.pkt",
+      "after": "running-only.pkt",
+      "config": "startup",
+      "expect_semantic_change": false
+    },
+    {
+      "id": "startup-saved",
+      "before": "running-only.pkt",
+      "after": "startup-saved.pkt",
+      "config": "startup",
+      "expect_semantic_change": true
+    }
+  ]
+}

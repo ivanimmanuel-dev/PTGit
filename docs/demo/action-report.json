@@ -1,0 +1,29 @@
+{
+  "base": "68f54f4420fad7750249ddb486a699480ecc16a9",
+  "files": [
+    {
+      "change": "M",
+      "counts": {
+        "devices_added": 0,
+        "devices_changed": 2,
+        "devices_removed": 0,
+        "links_added": 1,
+        "links_removed": 0,
+        "lint_errors": 0,
+        "warnings": 0
+      },
+      "diff": "R1\n  interface GigabitEthernet0/0\n   ip address 192.168.10.1/24\n   no shutdown\n+ interface GigabitEthernet0/1\n+  ip address 10.10.20.1/24\n+  no shutdown\n\nSW2\n  interface GigabitEthernet0/1\n   switchport mode access\n-  switchport access vlan 10\n+  switchport access vlan 20\n\nTopology\n+ R1:GigabitEthernet0/1 <-> SW2:GigabitEthernet0/1 [eStraightThrough]\n",
+      "diff_truncated": false,
+      "findings": [],
+      "findings_truncated": false,
+      "path": ".ptgit-action-selftest/lab with spaces.pkt",
+      "previous_path": null,
+      "semantic_changed": true,
+      "status": "ok"
+    }
+  ],
+  "head": "bc0c15608490502f5ba5caa7df0b38afcd1025f7",
+  "merge_base": "68f54f4420fad7750249ddb486a699480ecc16a9",
+  "ptgit_version": "0.1.0",
+  "schema_version": 1
+}

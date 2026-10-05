@@ -1,0 +1,43 @@
+<PACKETTRACER5>
+  <VERSION>9.0.1</VERSION>
+  <NETWORK>
+    <DEVICES>
+      <DEVICE>
+        <ENGINE>
+          <TYPE model="2911">Router</TYPE><NAME>R1</NAME><SAVE_REF_ID>r1</SAVE_REF_ID>
+          <RUNNINGCONFIG>
+            <LINE>hostname R1</LINE>
+            <LINE>interface GigabitEthernet0/0</LINE>
+            <LINE> ip address 192.168.10.1 255.255.255.0</LINE>
+            <LINE> no shutdown</LINE>
+            <LINE>!</LINE>
+            <LINE>interface GigabitEthernet0/1</LINE>
+            <LINE> ip address 10.10.20.1 255.255.255.0</LINE>
+            <LINE> no shutdown</LINE>
+            <LINE>!</LINE><LINE>end</LINE>
+          </RUNNINGCONFIG>
+        </ENGINE>
+        <WORKSPACE><LOGICAL><X>800</X><Y>300</Y><MEM_ADDR>9999</MEM_ADDR></LOGICAL></WORKSPACE>
+      </DEVICE>
+      <DEVICE>
+        <ENGINE>
+          <TYPE model="2960-24TT">Switch</TYPE><NAME>SW2</NAME><SAVE_REF_ID>sw2</SAVE_REF_ID>
+          <VLANS><VLAN number="10" name="Students"/><VLAN number="20" name="Lab"/></VLANS>
+          <RUNNINGCONFIG>
+            <LINE>hostname SW2</LINE>
+            <LINE>interface GigabitEthernet0/1</LINE>
+            <LINE> switchport mode access</LINE>
+            <LINE> switchport access vlan 20</LINE>
+            <LINE>!</LINE><LINE>end</LINE>
+          </RUNNINGCONFIG>
+        </ENGINE>
+      </DEVICE>
+    </DEVICES>
+    <LINKS>
+      <LINK><TYPE>eCopper</TYPE><CABLE>
+        <FROM>r1</FROM><PORT>GigabitEthernet0/1</PORT>
+        <TO>sw2</TO><PORT>GigabitEthernet0/1</PORT><TYPE>eStraightThrough</TYPE>
+      </CABLE></LINK>
+    </LINKS>
+  </NETWORK>
+</PACKETTRACER5>

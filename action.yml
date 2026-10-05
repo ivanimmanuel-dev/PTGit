@@ -1,0 +1,58 @@
+name: PT Git
+description: Meaningful Packet Tracer changes in GitHub Job Summaries
+author: PT Git contributors
+branding:
+  icon: git-pull-request
+  color: blue
+inputs:
+  base:
+    description: Full base commit SHA (defaults to the PR base)
+    required: false
+  head:
+    description: Full head commit SHA (defaults to the PR head)
+    required: false
+  max-files:
+    description: Maximum changed Packet Tracer files to inspect (1-100)
+    default: '40'
+  timeout-seconds:
+    description: Maximum decode/compare time per file pair (1-120)
+    default: '30'
+  fail-on-lint:
+    description: Fail on static lint errors as well as decode failures
+    default: 'false'
+  upload-artifact:
+    description: Upload deterministic JSON and the rendered summary
+    default: 'true'
+outputs:
+  report:
+    description: Absolute path to the deterministic JSON report
+    value: ${{ steps.report.outputs.report }}
+  changed-files:
+    description: Number of changed .pkt paths in the PR
+    value: ${{ steps.report.outputs.changed-files }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Analyze Packet Tracer changes
+      id: report
+      shell: bash
+      env:
+        PTGIT_ACTION_PATH: ${{ github.action_path }}
+        PTGIT_BASE: ${{ inputs.base }}
+        PTGIT_HEAD: ${{ inputs.head }}
+        PTGIT_MAX_FILES: ${{ inputs.max-files }}
+        PTGIT_TIMEOUT: ${{ inputs.timeout-seconds }}
+        PTGIT_FAIL_ON_LINT: ${{ inputs.fail-on-lint }}
+      run: python -I "$PTGIT_ACTION_PATH/scripts/action_entry.py"
+    - name: Upload PT Git report
+      if: ${{ always() && inputs.upload-artifact == 'true' && steps.report.outputs.report != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ptgit-report-${{ github.job }}-${{ github.run_attempt }}
+        path: |
+          ${{ steps.report.outputs.report }}
+          ${{ steps.report.outputs.summary }}
+        retention-days: 14

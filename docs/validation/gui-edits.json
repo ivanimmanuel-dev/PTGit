@@ -1,0 +1,79 @@
+{
+  "after_bytes": 86283,
+  "after_sha256": "3dd9f0873b247adfe9706c6717a6d38bb45d02a5fff6769e39fb3e9f4f10c0dd",
+  "before_bytes": 86166,
+  "before_sha256": "4818382a02410d3e6173316c28d679f840f3ff2ae1e34697945e8050278860f7",
+  "binary_changed": true,
+  "case": "Router display-name change and PC default-gateway removal",
+  "comparisons": [
+    {
+      "after_saved_version": "9.0.1.0858",
+      "before_saved_version": "9.0.1.0858",
+      "cables": 8,
+      "config": "running",
+      "counts": {
+        "devices_added": 1,
+        "devices_changed": 1,
+        "devices_removed": 1,
+        "links_added": 3,
+        "links_removed": 3,
+        "lint_errors": 0,
+        "warnings": 0
+      },
+      "devices": 10,
+      "export_changed": true,
+      "lint_codes": [
+        "NO_CABLE"
+      ],
+      "only_rename_and_gateway_removal": true,
+      "semantic_changed": true,
+      "textconv_changed": true
+    },
+    {
+      "after_saved_version": "9.0.1.0858",
+      "before_saved_version": "9.0.1.0858",
+      "cables": 8,
+      "config": "startup",
+      "counts": {
+        "devices_added": 1,
+        "devices_changed": 1,
+        "devices_removed": 1,
+        "links_added": 3,
+        "links_removed": 3,
+        "lint_errors": 0,
+        "warnings": 0
+      },
+      "devices": 10,
+      "export_changed": true,
+      "lint_codes": [
+        "NO_CABLE"
+      ],
+      "only_rename_and_gateway_removal": true,
+      "semantic_changed": true,
+      "textconv_changed": true
+    }
+  ],
+  "date": "2026-10-05",
+  "decoded_xml_confirms_gateway_removal": true,
+  "observed_changes": [
+    "Router display name changed",
+    "PC default gateway removed"
+  ],
+  "original_unchanged": true,
+  "packet_tracer_build": "9.0.1.0858",
+  "passed": true,
+  "provenance": "Contributor-edited lab; application build read from Help > About.",
+  "rename_representation": "Device removed/added; three cable endpoints relabeled, with no actual cable addition/removal after matching the renamed device.",
+  "schema_version": 1,
+  "verification": {
+    "cli_running_and_startup_exit_1": true,
+    "exports_repeat_identically": true,
+    "fresh_wheel_install": true,
+    "hosted_github_action_run": false,
+    "installed_staged_textconv_detects_both_changes": true,
+    "installed_unstaged_textconv_detects_both_changes": true,
+    "local_action_runner_detects_both_changes": true,
+    "ordinary_git_detects_binary_change": true,
+    "staged_and_unstaged_outputs_identical": true
+  }
+}

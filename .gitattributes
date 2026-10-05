@@ -1,0 +1,7 @@
+* text=auto eol=lf
+ptgit/_vendor/** -text
+
+# BEGIN PT Git
+*.pkt diff=ptgit -text
+*.PKT diff=ptgit -text
+# END PT Git

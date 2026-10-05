@@ -1,0 +1,50 @@
+$ git diff -- lab.pkt
+diff --git a/lab.pkt b/lab.pkt
+index eb3c998..9613245 100644
+Binary files a/lab.pkt and b/lab.pkt differ
+
+$ ptgit diff old.pkt lab.pkt
+R1
+  interface GigabitEthernet0/0
+   ip address 192.168.10.1/24
+   no shutdown
++ interface GigabitEthernet0/1
++  ip address 10.10.20.1/24
++  no shutdown
+
+SW2
+  interface GigabitEthernet0/1
+   switchport mode access
+-  switchport access vlan 10
++  switchport access vlan 20
+
+Topology
++ R1:GigabitEthernet0/1 <-> SW2:GigabitEthernet0/1 [eStraightThrough]
+
+$ git diff -- lab.pkt  # after ptgit init
+diff --git a/lab.pkt b/lab.pkt
+index eb3c998..9613245 100644
+--- a/lab.pkt
++++ b/lab.pkt
+@@ -7,6 +7,9 @@ R1
+   interface GigabitEthernet0/0
+    ip address 192.168.10.1/24
+    no shutdown
++  interface GigabitEthernet0/1
++   ip address 10.10.20.1/24
++   no shutdown
+ 
+ SW2
+   type Switch (2960-24TT)
+@@ -16,8 +19,9 @@ SW2
+   hostname SW2
+   interface GigabitEthernet0/1
+    switchport mode access
+-   switchport access vlan 10
++   switchport access vlan 20
+ 
+ Topology
++  R1:GigabitEthernet0/1 <-> SW2:GigabitEthernet0/1 [eStraightThrough]
+ 
+-Modeled fields SHA-256: fa7cbde23887f7c7a10ca1fe29b768c62dfea00f30a34aa9095c01e956d9c224
++Modeled fields SHA-256: 3881c33239bf69826bcfdde5c7c15068758c2a1cd885a149f55d2296a67acf8c

@@ -1,0 +1,16 @@
+R1
+  interface GigabitEthernet0/0
+   ip address 192.168.10.1/24
+   no shutdown
++ interface GigabitEthernet0/1
++  ip address 10.10.20.1/24
++  no shutdown
+
+SW2
+  interface GigabitEthernet0/1
+   switchport mode access
+-  switchport access vlan 10
++  switchport access vlan 20
+
+Topology
++ R1:GigabitEthernet0/1 <-> SW2:GigabitEthernet0/1 [eStraightThrough]

@@ -1,0 +1,47 @@
+name: Tests
+on: [push, pull_request, workflow_call]
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.10', '3.11', '3.12', '3.13', '3.14']
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tests -v
+      - run: python -m pip install build twine
+      - run: python -m build
+      - run: python -m twine check dist/*
+        shell: bash
+      - run: python scripts/check_install.py dist/packet_tracer_git-0.1.0-py3-none-any.whl
+  action-selftest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - id: fixture
+        run: python scripts/action_selftest.py prepare
+      - uses: ./
+        id: ptgit
+        with:
+          base: ${{ steps.fixture.outputs.base }}
+          head: ${{ steps.fixture.outputs.head }}
+      - name: Verify report
+        env:
+          REPORT: ${{ steps.ptgit.outputs.report }}
+        run: python scripts/action_selftest.py assert "$REPORT"
