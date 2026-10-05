@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: ivanimmanuel-dev/PTGit@v0.1.0
+      - uses: ivanimmanuel-dev/PTGit@v0.1.1
 ```
 
 The Action uses Python 3.12 on Ubuntu. A full commit SHA can replace the version
@@ -40,7 +40,7 @@ to read the comparison.
 | `upload-artifact` | `true` | Upload JSON and summary with 14-day retention |
 
 ```yaml
-- uses: ivanimmanuel-dev/PTGit@v0.1.0
+- uses: ivanimmanuel-dev/PTGit@v0.1.1
   id: ptgit
   with:
     fail-on-lint: 'true'

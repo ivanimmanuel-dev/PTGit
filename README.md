@@ -6,7 +6,7 @@ GitHub pull request.
 
 [![Tests](https://github.com/ivanimmanuel-dev/PTGit/actions/workflows/tests.yml/badge.svg)](https://github.com/ivanimmanuel-dev/PTGit/actions/workflows/tests.yml)
 
-[Download v0.1.0](https://github.com/ivanimmanuel-dev/PTGit/releases/tag/v0.1.0) ·
+[Download v0.1.1](https://github.com/ivanimmanuel-dev/PTGit/releases/tag/v0.1.1) ·
 [GitHub Marketplace](https://github.com/marketplace/actions/pt-git-diff)
 
 ```diff
@@ -33,7 +33,7 @@ Topology
 Requires Python 3.10+ and Git. From your lab's Git repository:
 
 ```console
-python -m pip install "git+https://github.com/ivanimmanuel-dev/PTGit.git@v0.1.0"
+python -m pip install "git+https://github.com/ivanimmanuel-dev/PTGit.git@v0.1.1"
 ptgit init
 git add .gitattributes
 git diff -- lab.pkt
@@ -82,7 +82,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: ivanimmanuel-dev/PTGit@v0.1.0
+      - uses: ivanimmanuel-dev/PTGit@v0.1.1
 ```
 
 [Action options](docs/github-action.md) · [Git setup](docs/git-integration.md)

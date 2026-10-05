@@ -21,7 +21,7 @@ def run_cli(*args, cwd=ROOT):
 class CLITests(unittest.TestCase):
     def test_help_and_version(self):
         self.assertEqual(run_cli("--help").returncode, 0)
-        self.assertEqual(run_cli("--version").stdout.strip(), "ptgit 0.1.0")
+        self.assertEqual(run_cli("--version").stdout.strip(), "ptgit 0.1.1")
 
     def test_show_export_lint_and_no_input_mutation(self):
         path = FIXTURES / "new.pkt"

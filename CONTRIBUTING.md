@@ -27,7 +27,7 @@ To check packaging and a fresh installation:
 python -m pip install build twine
 python -m build
 python -m twine check dist/*
-python scripts/check_install.py dist/packet_tracer_git-0.1.0-py3-none-any.whl
+python scripts/check_install.py dist/packet_tracer_git-0.1.1-py3-none-any.whl
 ```
 
 Keep upstream license notices when changing vendored code. Report vulnerabilities

@@ -34,7 +34,7 @@ def check(wheel):
             return result.stdout
 
         run(python, "-m", "pip", "install", "--no-index", "--no-deps", wheel)
-        assert run(cli, "--version").strip() == "ptgit 0.1.0"
+        assert run(cli, "--version").strip() == "ptgit 0.1.1"
         assert run(python, "-m", "ptgit", "--version") == run(cli, "--version")
         imported = run(python, "-c", "import ptgit; print(ptgit.__file__)").strip()
         assert environment.resolve() in Path(imported).resolve().parents, imported
